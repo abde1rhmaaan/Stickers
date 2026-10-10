@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0a0c0b">
+<title>Sticker Studio</title>
+<style>
+:root{--bg:#0a0c0b;--panel:#121613;--panel2:#1a201b;--line:#293128;--text:#edf2e9;--muted:#9ca79a;--accent:#c8f14e;--red:#ff7777}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,select{font:inherit}button{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:11px;padding:10px 13px;cursor:pointer}button.primary{background:var(--accent);color:#11150b;border-color:var(--accent);font-weight:800}button:disabled{opacity:.4}
+header{height:62px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 16px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;background:#0a0c0bf0;backdrop-filter:blur(12px)}
+.brand{font-weight:900;letter-spacing:.07em;direction:ltr;white-space:nowrap}.brand span{color:var(--accent)}.head-actions{display:flex;align-items:center;gap:8px}.small{font-size:12px;color:var(--muted)}
+main{max-width:1120px;margin:auto;padding:16px}.screen{display:none}.screen.active{display:block}
+.page-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:8px 0 18px}.page-head h1{font-size:clamp(23px,4vw,34px);margin:0}.page-head p{margin:5px 0 0;color:var(--muted)}
+.pack-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px}
+.pack-card{min-height:165px;text-align:right;padding:12px;border:1px solid var(--line);background:var(--panel);border-radius:15px;display:flex;flex-direction:column;gap:10px;cursor:pointer}
+.pack-cover{height:95px;border-radius:10px;background-color:#171c17;background-image:linear-gradient(45deg,#242a23 25%,transparent 25%),linear-gradient(-45deg,#242a23 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#242a23 75%),linear-gradient(-45deg,transparent 75%,#242a23 75%);background-size:16px 16px;display:flex;align-items:center;justify-content:center;gap:3px;overflow:hidden}
+.pack-cover img{width:31%;height:75%;object-fit:contain}.pack-name{font-weight:800;overflow-wrap:anywhere}.pack-meta{color:var(--muted);font-size:12px}
+.empty{border:1px dashed #394336;border-radius:14px;padding:25px;text-align:center;color:var(--muted);grid-column:1/-1}
+.editor-layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(280px,.7fr);gap:14px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;overflow:hidden;min-width:0}
+.panel-head{padding:13px 15px;border-bottom:1px solid var(--line);font-weight:800;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.stage-wrap{padding:12px}.stage{height:min(53vh,550px);min-height:270px;position:relative;border-radius:12px;overflow:hidden;background-color:#171c17;background-image:linear-gradient(45deg,#242a23 25%,transparent 25%),linear-gradient(-45deg,#242a23 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#242a23 75%),linear-gradient(-45deg,transparent 75%,#242a23 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0;touch-action:none}
+#canvas{width:100%;height:100%;display:block;touch-action:none}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px}.step-tab{padding:9px 5px;font-size:12px;border-radius:10px;color:var(--muted)}.step-tab.active{border-color:var(--accent);color:var(--accent);background:#c8f14e10}.step-tab.done{color:var(--text)}
+.controls{padding:13px;display:flex;flex-direction:column;gap:13px}.group{border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:11px}.group h3{margin:0;color:var(--accent);font-size:11px;letter-spacing:.09em}
+.field{display:grid;grid-template-columns:1fr minmax(105px,1.1fr);gap:10px;align-items:center}.field label{font-size:12px;color:#c4cec0}.field input[type=color]{width:100%;height:36px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:3px}.field input[type=range]{width:100%;accent-color:var(--accent)}.field input[type=text],.field select{min-width:0;width:100%;padding:9px;background:#0c100d;color:var(--text);border:1px solid var(--line);border-radius:8px}.field output{text-align:left;color:var(--muted);font-variant-numeric:tabular-nums}
+.row{display:flex;gap:8px}.row>*{flex:1;min-width:0}.buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.buttons>*{flex:1}.hint{color:var(--muted);font-size:12px}.sticker-strip{display:flex;gap:8px;overflow:auto;padding:10px}.mini{flex:0 0 74px;height:74px;border:1px solid var(--line);border-radius:10px;padding:5px;object-fit:contain;background-color:#171c17;background-image:linear-gradient(45deg,#242a23 25%,transparent 25%),linear-gradient(-45deg,#242a23 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#242a23 75%),linear-gradient(-45deg,transparent 75%,#242a23 75%);background-size:12px 12px}
+.text-tools{display:flex;gap:7px;flex-wrap:wrap}.text-tools button{flex:1}
+.status{border-top:1px solid var(--line);padding:10px 13px;color:var(--muted);font-size:12px;min-height:38px}
+footer{max-width:1120px;margin:0 auto;padding:0 16px 22px;color:var(--muted);font-size:11px}
+@media(max-width:760px){main{padding:10px}.editor-layout{grid-template-columns:1fr;gap:10px}.stage{height:40vh;min-height:235px}.page-head{align-items:start;flex-direction:column}.pack-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.controls{padding:10px}.panel-head{padding:11px 12px}header{padding:0 11px}.head-actions button{padding:8px}.steps{gap:4px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">STICKER <span>STUDIO</span></div>
+  <div class="head-actions"><span id="headerPack" class="small"></span><button id="homeBtn">المجموعات</button></div>
+</header>
+<main>
+<section id="homeScreen" class="screen active">
+  <div class="page-head"><div><h1>مجموعات الستيكرات</h1><p>اختار مجموعة تكمل فيها أو اعمل مجموعة جديدة.</p></div><button id="createPackBtn" class="primary">＋ مجموعة جديدة</button></div>
+  <div id="packGrid" class="pack-grid"></div>
+</section>
+<section id="packScreen" class="screen">
+  <div class="page-head"><div><h1 id="packTitle">مجموعتي</h1><p id="packSubtitle">ستيكرات المجموعة</p></div><div class="row"><button id="renameBtn">تغيير الاسم</button><button id="addStickerBtn" class="primary">＋ ستيكر جديد</button></div></div>
+  <div id="packStickers" class="pack-grid"></div>
+  <div class="buttons"><button id="exportPackBtn" class="primary">تصدير المجموعة</button><button id="deletePackBtn">حذف المجموعة</button></div>
+  <p class="hint">التصدير يحفظ كل الستيكرات في ZIP. الإضافة المباشرة لواتساب تحتاج تكامل Android أو تطبيق حزم متوافق.</p>
+</section>
+<section id="editScreen" class="screen">
+  <div class="page-head"><div><h1 id="editTitle">إنشاء ستيكر</h1><p>امشِ بالخطوات، وشوف التغييرات مباشرة على المعاينة.</p></div><span class="small" id="editPackLabel"></span></div>
+  <div class="steps">
+    <button class="step-tab active" data-step="1">١ · القص</button>
+    <button class="step-tab" data-step="2">٢ · الحدود</button>
+    <button class="step-tab" data-step="3">٣ · النص</button>
+  </div>
+  <div class="editor-layout">
+    <section class="panel">
+      <div class="panel-head"><span id="stageTitle">١. اختار طريقة القص</span><button id="chooseImageBtn">اختيار صورة</button><input id="imageInput" type="file" accept="image/*" hidden></div>
+      <div class="stage-wrap"><div class="stage"><canvas id="canvas" width="900" height="700"></canvas></div>
+        <div class="buttons" id="stageButtons">
+          <button id="fullImageBtn">استخدام الصورة كاملة</button><button id="clearCutBtn">مسح التحديد</button>
+        </div>
+      </div>
+      <div class="status" id="status">اختار صورة، ثم ارسم التحديد بإصبعك.</div>
+    </section>
+    <aside class="panel">
+      <div class="panel-head">إعدادات الخطوة</div>
+      <div class="controls" id="step1Controls">
+        <div class="group"><h3>طريقة القص</h3>
+          <div class="row"><button data-mode="free" class="mode active">قص حر</button><button data-mode="rect" class="mode">مستطيل</button><button data-mode="circle" class="mode">دائرة</button></div>
+          <div class="hint">في القص الحر لفّ بإصبعك حول الجزء المطلوب. لو عاوز الصورة كاملة اضغط الزر أسفل المعاينة.</div>
+        </div>
+      </div>
+      <div class="controls" id="step2Controls" hidden>
+        <div class="group"><h3>حدود الستيكر</h3>
+          <div class="field"><label for="outlineColor">لون الحدود</label><input id="outlineColor" type="color" value="#ffffff"></div>
+          <div class="field"><label for="outlineWidth">سُمك الحدود</label><input id="outlineWidth" type="range" min="0" max="32" value="7"></div>
+          <div class="field"><label></label><output id="outlineOut">7 px</output></div>
+          <div class="hint">غيّر اللون أو السُمك وهتشوف النتيجة لايف على المعاينة.</div>
+        </div>
+      </div>
+      <div class="controls" id="step3Controls" hidden>
+        <div class="group"><h3>النص</h3>
+          <div class="field"><label for="textValue">اكتب النص</label><input id="textValue" type="text" placeholder="اكتب هنا…"></div>
+          <div class="field"><label for="textColor">لون النص</label><input id="textColor" type="color" value="#ffffff"></div>
+          <div class="field"><label for="textStrokeColor">لون حدود النص</label><input id="textStrokeColor" type="color" value="#111111"></div>
+          <div class="field"><label for="textStrokeWidth">سُمك حدود النص</label><input id="textStrokeWidth" type="range" min="0" max="16" value="4"></div>
+          <div class="field"><label></label><output id="textStrokeOut">4 px</output></div>
+          <div class="field"><label for="textSize">حجم النص</label><input id="textSize" type="range" min="12" max="120" value="42"></div>
+          <div class="field"><label></label><output id="textSizeOut">42 px</output></div>
+          <div class="field"><label for="textRotation">تدوير النص</label><input id="textRotation" type="range" min="-180" max="180" value="0"></div>
+          <div class="field"><label></label><output id="textRotationOut">0°</output></div>
+          <div class="text-tools"><button id="centerTextBtn">توسيط النص</button><button id="removeTextBtn">إزالة النص</button></div>
+          <div class="hint">اسحب النص بإصبعك لتحريكه. بإصبعين تقدر تكبّره أو تصغّره وتلفّه. المقابض بتوضح مكان النص.</div>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="buttons"><button id="backStepBtn">السابق</button><button id="nextStepBtn" class="primary">التالي</button><button id="saveStickerBtn" class="primary" hidden>حفظ الستيكر</button></div>
+        <button id="cancelEditBtn">إلغاء والرجوع للمجموعة</button>
+      </div>
+    </aside>
+  </div>
+</section>
+</main>
+<footer>Sticker Studio · تعديل محلي داخل المتصفح · صدّر المجموعة قبل إغلاق الصفحة حتى تحتفظ بنسخة من الستيكرات.</footer>
+<script>
+(() => {
+const $=id=>document.getElementById(id), canvas=$('canvas'),ctx=canvas.getContext('2d');
+let packs=[], currentPackId=null, editStep=1, source=null, sourceName='sticker', mode='free', points=[], drawing=false, fullImage=false, undoPoints=[];
+let textTransform={x:.5,y:.78,scale:1,rotation:0}, pointers=new Map(), gesture=null, editingStickerId=null;
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const currentPack=()=>packs.find(p=>p.id===currentPackId);
+function saveLocal(){try{localStorage.setItem('sticker-studio-meta',JSON.stringify(packs.map(p=>({id:p.id,name:p.name,stickers:p.stickers.map(s=>({id:s.id,name:s.name,data:s.data}))}))));}catch(e){}}
+function loadLocal(){try{const x=JSON.parse(localStorage.getItem('sticker-studio-meta')||'[]');packs=x.map(p=>({...p,stickers:(p.stickers||[]).map(s=>({...s}))}));}catch(e){packs=[];}if(!packs.length){packs=[{id:uid(),name:'My Stickers',stickers:[]}];saveLocal();}}
+function setScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===id));$('headerPack').textContent=id==='homeScreen'?'':(currentPack()?.name||'');}
+function packCover(pack){return pack.stickers.slice(0,3).map(s=>`<img src="${s.data}" alt="">`).join('')||'<span style="font-size:32px;color:#c8f14e">＋</span>';}
+function renderHome(){const grid=$('packGrid');grid.innerHTML='';if(!packs.length){grid.innerHTML='<div class="empty">لسه مفيش مجموعات. اضغط «مجموعة جديدة» للبدء.</div>';return;}packs.forEach(p=>{const card=document.createElement('div');card.className='pack-card';card.innerHTML=`<div class="pack-cover">${packCover(p)}</div><div class="pack-name"></div><div class="pack-meta">${p.stickers.length} ستيكر</div>`;card.querySelector('.pack-name').textContent=p.name;card.onclick=()=>openPack(p.id);grid.append(card);});}
+function openPack(id){currentPackId=id;const p=currentPack();$('packTitle').textContent=p.name;$('packSubtitle').textContent=`${p.stickers.length} ستيكر في المجموعة`;$('headerPack').textContent=p.name;renderPack();setScreen('packScreen');}
+function renderPack(){const p=currentPack(),grid=$('packStickers');grid.innerHTML='';$('packTitle').textContent=p.name;$('packSubtitle').textContent=`${p.stickers.length} ستيكر في المجموعة`;if(!p.stickers.length){grid.innerHTML='<div class="empty">المجموعة دي فاضية. اضغط «ستيكر جديد» لإضافة أول صورة.</div>';return;}p.stickers.forEach(s=>{const card=document.createElement('div');card.className='pack-card';card.innerHTML=`<div class="pack-cover"><img src="${s.data}" alt="" style="width:90%;height:90%"></div><div class="pack-name"></div><div class="pack-meta">PNG شفاف</div><div class="row"><button class="editOne">تعديل</button><button class="delOne">حذف</button></div>`;card.querySelector('.pack-name').textContent=s.name;card.querySelector('.editOne').onclick=e=>{e.stopPropagation();editSticker(s.id);};card.querySelector('.delOne').onclick=e=>{e.stopPropagation();p.stickers=p.stickers.filter(x=>x.id!==s.id);saveLocal();renderPack();};grid.append(card);});}
+$('createPackBtn').onclick=()=>{const name=prompt('اسم المجموعة الجديدة:','ستيكراتي الجديدة');if(!name?.trim())return;const p={id:uid(),name:name.trim(),stickers:[]};packs.unshift(p);currentPackId=p.id;saveLocal();openPack(p.id);};
+$('renameBtn').onclick=()=>{const p=currentPack(),n=prompt('اسم المجموعة:',p.name);if(n?.trim()){p.name=n.trim();saveLocal();openPack(p.id);}};
+$('deletePackBtn').onclick=()=>{const p=currentPack();if(!confirm(`حذف مجموعة «${p.name}» وكل ستيكراتها؟`))return;packs=packs.filter(x=>x.id!==p.id);if(!packs.length)packs=[{id:uid(),name:'My Stickers',stickers:[]}];currentPackId=null;saveLocal();renderHome();setScreen('homeScreen');};
+$('homeBtn').onclick=()=>{renderHome();setScreen('homeScreen');};
+$('addStickerBtn').onclick=()=>startNewSticker();
+$('cancelEditBtn').onclick=()=>openPack(currentPackId);
+function startNewSticker(){editingStickerId=null;source=null;sourceName='sticker';points=[];fullImage=false;mode='free';textTransform={x:.5,y:.78,scale:1,rotation:0};$('textValue').value='';$('outlineColor').value='#ffffff';$('outlineWidth').value=7;$('textColor').value='#ffffff';$('textStrokeColor').value='#111111';$('textStrokeWidth').value=4;$('textSize').value=42;$('textRotation').value=0;updateOutputs();editStep=1;setStep(1);setScreen('editScreen');$('editPackLabel').textContent=currentPack().name;draw();}
+function editSticker(id){const s=currentPack().stickers.find(x=>x.id===id);if(!s)return;startNewSticker();editingStickerId=id;const img=new Image();img.onload=()=>{source=img;sourceName=s.name;fullImage=true;points=[];draw();setStatus('الستيكر مفتوح للتعديل. اختار صورة أخرى لو عاوز تبدأ من جديد.');};img.src=s.data;}
+function updateOutputs(){$('outlineOut').textContent=$('outlineWidth').value+' px';$('textStrokeOut').textContent=$('textStrokeWidth').value+' px';$('textSizeOut').textContent=$('textSize').value+' px';$('textRotationOut').textContent=$('textRotation').value+'°';}
+['outlineWidth','textStrokeWidth','textSize','textRotation'].forEach(id=>$(id).addEventListener('input',()=>{updateOutputs();if(id==='textRotation')textTransform.rotation=Number($('textRotation').value)*Math.PI/180;draw();}));
+['outlineColor','textValue','textColor','textStrokeColor'].forEach(id=>$(id).addEventListener('input',draw));
+$('chooseImageBtn').onclick=()=>$('imageInput').click();
+$('imageInput').onchange=e=>{const f=e.target.files[0];if(!f)return;const url=URL.createObjectURL(f),im=new Image();im.onload=()=>{source=im;sourceName=f.name.replace(/\.[^.]+$/,'')||'sticker';points=[];fullImage=false;textTransform={x:.5,y:.78,scale:1,rotation:0};draw();setStatus('الصورة جاهزة. ارسم التحديد أو اختار استخدام الصورة كاملة.');URL.revokeObjectURL(url);};im.onerror=()=>setStatus('مش قادر أفتح الصورة دي.');im.src=url;};
+function setStatus(s){$('status').textContent=s;}
+function setStep(n){editStep=n;document.querySelectorAll('[data-step]').forEach(b=>{b.classList.toggle('active',+b.dataset.step===n);b.classList.toggle('done',+b.dataset.step<n);});$('step1Controls').hidden=n!==1;$('step2Controls').hidden=n!==2;$('step3Controls').hidden=n!==3;$('stageTitle').textContent=['','١. قص الصورة','٢. ضبط حدود الستيكر','٣. إضافة وتحريك النص'][n];$('stageButtons').style.display=n===1?'flex':'none';$('backStepBtn').style.display=n===1?'none':'block';$('nextStepBtn').hidden=n===3;$('saveStickerBtn').hidden=n!==3;draw();}
+document.querySelectorAll('[data-step]').forEach(b=>b.onclick=()=>{const n=+b.dataset.step;if(n>1&&!source){setStatus('اختار صورة الأول.');return;}if(n>1&&editStep===1&&n===2){}setStep(n);});
+document.querySelectorAll('.mode').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;fullImage=false;points=[];document.querySelectorAll('.mode').forEach(x=>x.classList.toggle('active',x===b));draw();setStatus('ارسم التحديد على الصورة.');});
+$('fullImageBtn').onclick=()=>{fullImage=true;points=[];draw();setStatus('هتستخدم الصورة كاملة. اضغط التالي.');};
+$('clearCutBtn').onclick=()=>{fullImage=false;points=[];undoPoints=[];draw();setStatus('التحديد اتمسح.');};
+$('backStepBtn').onclick=()=>setStep(Math.max(1,editStep-1));
+$('nextStepBtn').onclick=()=>{if(!source){setStatus('اختار صورة الأول.');return;}if(editStep===1&&!fullImage&&!points.length){setStatus('ارسم منطقة القص أو اضغط استخدام الصورة كاملة.');return;}setStep(Math.min(3,editStep+1));};
+function imageRect(){if(!source)return{x:0,y:0,w:canvas.width,h:canvas.height};const s=Math.min(canvas.width/source.width,canvas.height/source.height);const w=source.width*s,h=source.height*s;return{x:(canvas.width-w)/2,y:(canvas.height-h)/2,w,h};}
+function canvasPoint(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+function norm(p){const r=imageRect();if(p.x<r.x||p.x>r.x+r.w||p.y<r.y||p.y>r.y+r.h)return null;return{x:(p.x-r.x)/r.w,y:(p.y-r.y)/r.h};}
+function drawSelection(){if(!points.length||fullImage)return;const r=imageRect();ctx.save();ctx.strokeStyle='#c8f14e';ctx.fillStyle='rgba(200,241,78,.12)';ctx.lineWidth=3;ctx.setLineDash([8,5]);if(mode==='free'&&points.length>1){ctx.beginPath();ctx.moveTo(r.x+points[0].x*r.w,r.y+points[0].y*r.h);for(const p of points.slice(1))ctx.lineTo(r.x+p.x*r.w,r.y+p.y*r.h);ctx.closePath();ctx.fill();ctx.stroke();}else if(points.length>=2){const a=points[0],b=points[points.length-1],x=r.x+Math.min(a.x,b.x)*r.w,y=r.y+Math.min(a.y,b.y)*r.h,w=Math.abs(a.x-b.x)*r.w,h=Math.abs(a.y-b.y)*r.h;ctx.beginPath();if(mode==='rect')ctx.rect(x,y,w,h);else ctx.ellipse(x+w/2,y+h/2,w/2,h/2,0,0,Math.PI*2);ctx.fill();ctx.stroke();}ctx.restore();}
+function getCutCanvas(){if(!source)return null;const w=source.naturalWidth,h=source.naturalHeight,raw=document.createElement('canvas');raw.width=w;raw.height=h;const c=raw.getContext('2d');c.drawImage(source,0,0);if(!fullImage&&points.length){const mask=document.createElement('canvas');mask.width=w;mask.height=h;const m=mask.getContext('2d');m.fillStyle='#fff';if(mode==='free'&&points.length>=3){m.beginPath();m.moveTo(points[0].x*w,points[0].y*h);points.slice(1).forEach(p=>m.lineTo(p.x*w,p.y*h));m.closePath();m.fill();}else if(points.length>=2){const a=points[0],b=points[points.length-1],x=Math.min(a.x,b.x)*w,y=Math.min(a.y,b.y)*h,ww=Math.abs(a.x-b.x)*w,hh=Math.abs(a.y-b.y)*h;if(mode==='rect')m.fillRect(x,y,ww,hh);else{m.beginPath();m.ellipse(x+ww/2,y+hh/2,ww/2,hh/2,0,0,Math.PI*2);m.fill();}}c.globalCompositeOperation='destination-in';c.drawImage(mask,0,0);c.globalCompositeOperation='source-over';}
+const d=c.getImageData(0,0,w,h).data;let minX=w,minY=h,maxX=-1,maxY=-1;for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(d[(y*w+x)*4+3]>0){minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y);}if(maxX<minX)return null;const out=document.createElement('canvas');out.width=maxX-minX+1;out.height=maxY-minY+1;out.getContext('2d').drawImage(raw,minX,minY,out.width,out.height,0,0,out.width,out.height);return out;}
+function alphaCanvas(c){const a=document.createElement('canvas');a.width=c.width;a.height=c.height;a.getContext('2d').drawImage(c,0,0);return a;}
+function makeStickerCanvas(){
+ const cut=getCutCanvas();if(!cut)return null;const ow=Number($('outlineWidth').value),pad=Math.max(12,ow*3+8),base=document.createElement('canvas');base.width=cut.width+pad*2;base.height=cut.height+pad*2;base.getContext('2d').drawImage(cut,pad,pad);
+ const result=document.createElement('canvas');result.width=base.width;result.height=base.height;const c=result.getContext('2d');
+ if(ow>0){const colored=alphaCanvas(base),cc=colored.getContext('2d');cc.globalCompositeOperation='source-in';cc.fillStyle=$('outlineColor').value;cc.fillRect(0,0,base.width,base.height);cc.globalCompositeOperation='source-over';const steps=Math.max(24,ow*8);for(let rad=1;rad<=ow;rad+=Math.max(1,ow/5))for(let i=0;i<steps;i++){const a=2*Math.PI*i/steps;c.drawImage(colored,Math.cos(a)*rad,Math.sin(a)*rad);} }
+ c.drawImage(base,0,0);
+ const txt=$('textValue').value.trim();if(txt){const size=Number($('textSize').value)*textTransform.scale,tcx=textTransform.x*result.width,tcy=textTransform.y*result.height;c.save();c.translate(tcx,tcy);c.rotate(textTransform.rotation);c.font=`800 ${size}px system-ui, sans-serif`;c.textAlign='center';c.textBaseline='middle';c.lineJoin='round';c.lineWidth=Number($('textStrokeWidth').value)*2;c.strokeStyle=$('textStrokeColor').value;c.fillStyle=$('textColor').value;if(c.lineWidth)c.strokeText(txt,0,0);c.fillText(txt,0,0);c.restore();}
+ const scale=Math.min(1,512/Math.max(result.width,result.height));if(scale<1){const sm=document.createElement('canvas');sm.width=Math.max(1,Math.round(result.width*scale));sm.height=Math.max(1,Math.round(result.height*scale));sm.getContext('2d').drawImage(result,0,0,sm.width,sm.height);return sm;}return result;
+}
+function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);if(source){if(editStep===1){const r=imageRect();ctx.drawImage(source,r.x,r.y,r.w,r.h);drawSelection();}else{const sticker=makeStickerCanvas();if(sticker){const maxW=canvas.width*.88,maxH=canvas.height*.88,s=Math.min(maxW/sticker.width,maxH/sticker.height);const w=sticker.width*s,h=sticker.height*s;ctx.drawImage(sticker,(canvas.width-w)/2,(canvas.height-h)/2,w,h);if(editStep===3&&$('textValue').value.trim()){const x=canvas.width/2+(textTransform.x-.5)*w,y=(canvas.height-h)/2+textTransform.y*h;ctx.save();ctx.strokeStyle='#c8f14e';ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.strokeRect(x-45,y-22,90,44);ctx.setLineDash([]);ctx.fillStyle='#c8f14e';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();ctx.restore();}}}}}
+let lastTouchPos=null;
+canvas.addEventListener('pointerdown',e=>{if(!source)return;canvas.setPointerCapture(e.pointerId);const p=canvasPoint(e);pointers.set(e.pointerId,p);if(editStep===1){const n=norm(p);if(!n)return;drawing=true;undoPoints.push(points.map(x=>({...x})));fullImage=false;if(mode==='free')points=[n];else points=[n,n];draw();return;}if(editStep===3&&$('textValue').value.trim()){const r=imageRect(),base=getCutCanvas();if(!base)return;const stickerW=base.width+Math.max(12,Number($('outlineWidth').value)*3+8)*2,stickerH=base.height+Math.max(12,Number($('outlineWidth').value)*3+8)*2;const s=Math.min(canvas.width*.88/stickerW,canvas.height*.88/stickerH),w=stickerW*s,h=stickerH*s;const center={x:canvas.width/2+(textTransform.x-.5)*w,y:(canvas.height-h)/2+textTransform.y*h};if(pointers.size===1){gesture={type:'move',start:p,orig:{...textTransform}};}else if(pointers.size===2){const ps=[...pointers.values()];gesture={type:'pinch',dist:Math.hypot(ps[1].x-ps[0].x,ps[1].y-ps[0].y),angle:Math.atan2(ps[1].y-ps[0].y,ps[1].x-ps[0].x),orig:{...textTransform},mid:{x:(ps[0].x+ps[1].x)/2,y:(ps[0].y+ps[1].y)/2},w,h};}}});
+canvas.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;const p=canvasPoint(e);pointers.set(e.pointerId,p);if(editStep===1&&drawing){const n=norm(p);if(!n)return;if(mode==='free')points.push(n);else points[1]=n;draw();return;}if(editStep===3&&gesture){if(gesture.type==='move'&&pointers.size===1){textTransform.x=Math.max(0,Math.min(1,gesture.orig.x+(p.x-gesture.start.x)/canvas.width));textTransform.y=Math.max(0,Math.min(1,gesture.orig.y+(p.y-gesture.start.y)/canvas.height));}else if(pointers.size>=2){const ps=[...pointers.values()],dist=Math.hypot(ps[1].x-ps[0].x,ps[1].y-ps[0].y),angle=Math.atan2(ps[1].y-ps[0].y,ps[1].x-ps[0].x);textTransform.scale=Math.max(.25,Math.min(3,gesture.orig.scale*dist/Math.max(1,gesture.dist)));textTransform.rotation=gesture.orig.rotation+(angle-gesture.angle);$('textRotation').value=Math.max(-180,Math.min(180,Math.round(textTransform.rotation*180/Math.PI)));updateOutputs();}draw();}});
+function pointerUp(e){pointers.delete(e.pointerId);if(editStep===1&&drawing){drawing=false;const n=norm(canvasPoint(e));if(n){if(mode==='free')points.push(n);else points[1]=n;}draw();}gesture=null;if(pointers.size===1&&editStep===3){const p=[...pointers.values()][0];gesture={type:'move',start:p,orig:{...textTransform}};}}
+canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('pointercancel',pointerUp);
+$('centerTextBtn').onclick=()=>{textTransform.x=.5;textTransform.y=.78;draw();};
+$('removeTextBtn').onclick=()=>{$('textValue').value='';draw();};
+$('saveStickerBtn').onclick=()=>{const c=makeStickerCanvas();if(!c){setStatus('اختار صورة وحدد منطقة صحيحة.');return;}const data=c.toDataURL('image/png'),p=currentPack();let name=sourceName||`sticker-${p.stickers.length+1}`;if(editingStickerId){const old=p.stickers.find(s=>s.id===editingStickerId);if(old)old.data=data;}else p.stickers.push({id:uid(),name:`${name} ${p.stickers.length+1}`,data});saveLocal();openPack(currentPackId);setStatus('تم حفظ الستيكر في المجموعة.');};
+function dataUrlBlob(data){const [head,b64]=data.split(',');const mime=(head.match(/:(.*?);/)||[])[1]||'image/png';const bin=atob(b64),arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);return new Blob([arr],{type:mime});}
+const crcTable=(()=>{let c,t=[];for(let n=0;n<256;n++){c=n;for(let k=0;k<8;k++)c=(c&1)?(0xedb88320^(c>>>1)):(c>>>1);t[n]=c>>>0;}return t;})();
+function crc32(b){let c=0xffffffff;for(let i=0;i<b.length;i++)c=crcTable[(c^b[i])&255]^(c>>>8);return(c^0xffffffff)>>>0;}function u16(n){return[n&255,(n>>>8)&255]}function u32(n){return[n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255]}function concat(chunks){const n=chunks.reduce((a,b)=>a+b.length,0),o=new Uint8Array(n);let p=0;for(const c of chunks){o.set(c,p);p+=c.length;}return o;}
+async function zipFiles(files){let local=[],central=[],offset=0;for(const f of files){const name=new TextEncoder().encode(f.name),data=new Uint8Array(await f.blob.arrayBuffer()),crc=crc32(data),lh=new Uint8Array([...u32(0x04034b50),...u16(20),...u16(0),...u16(0),...u16(0),...u16(0),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0)]);local.push(lh,name,data);const ch=new Uint8Array([...u32(0x02014b50),...u16(20),...u16(20),...u16(0),...u16(0),...u16(0),...u16(0),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(offset)]);central.push(ch,name);offset+=lh.length+name.length+data.length;}const cd=concat(central),lb=concat(local),end=new Uint8Array([...u32(0x06054b50),...u16(0),...u16(0),...u16(files.length),...u16(files.length),...u32(cd.length),...u32(lb.length),...u16(0)]);return new Blob([lb,cd,end],{type:'application/zip'});}
+async function exportPack(){const p=currentPack();if(!p.stickers.length){alert('المجموعة فاضية.');return;}if(window.AndroidStickerBridge&&typeof window.AndroidStickerBridge.addStickerPack==='function'){if(p.stickers.length<3||p.stickers.length>30){alert('واتساب بيقبل من 3 إلى 30 ستيكر في المجموعة.');return;}setStatus('جاري تجهيز المجموعة لواتساب...');window.AndroidStickerBridge.addStickerPack(p.name,JSON.stringify(p.stickers.map(s=>({name:s.name,data:s.data}))));return;}const files=p.stickers.map((s,i)=>({name:`sticker_${String(i+1).padStart(3,'0')}.png`,blob:dataUrlBlob(s.data)}));files.push({name:'pack.json',blob:new Blob([JSON.stringify({pack_name:p.name,stickers:files.map(f=>f.name),note:'PNG sticker archive; use a compatible WhatsApp sticker pack app to import.'},null,2)],{type:'application/json'})});const zip=await zipFiles(files),url=URL.createObjectURL(zip),a=document.createElement('a');a.href=url;a.download=p.name.replace(/[^\w-]+/g,'_')+'_stickers.zip';a.click();setTimeout(()=>URL.revokeObjectURL(url),5000);if(navigator.share&&navigator.canShare){try{const file=new File([zip],a.download,{type:'application/zip'});if(navigator.canShare({files:[file]}))setStatus('تم تنزيل ملف ZIP. يمكنك أيضًا مشاركته من قائمة المشاركة إذا دعم المتصفح ذلك.');else setStatus('تم تنزيل المجموعة. ملف ZIP ليس حزمة واتساب قابلة للتثبيت مباشرة.');}catch(e){setStatus('تم تنزيل المجموعة. ملف ZIP ليس حزمة واتساب قابلة للتثبيت مباشرة.');}}}
+$('exportPackBtn').onclick=exportPack;
+loadLocal();renderHome();setStep(1);draw();
+})();
+</script>
+</body>
+</html>
