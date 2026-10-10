@@ -71,7 +71,7 @@ class StickerContentProvider : ContentProvider() {
         if (segments.size < 3) throw FileNotFoundException("Malformed sticker URI")
         val packId = segments[1]
         val filename = File(segments[2]).name
-        val root = File(requireContext().filesDir, "sticker_packs/$packId")
+        val root = File(getProviderContext().filesDir, "sticker_packs/$packId")
         val file = if (filename == "tray.png") File(root, "tray.png") else File(root, "stickers/$filename")
         if (!file.exists()) throw FileNotFoundException(file.path)
         return ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
@@ -81,16 +81,16 @@ class StickerContentProvider : ContentProvider() {
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int = 0
     override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<out String>?): Int = 0
 
-    private fun requireContext() = context ?: throw IllegalStateException("Provider context unavailable")
+    private fun getProviderContext() = context ?: throw IllegalStateException("Provider context unavailable")
     private fun packs(): List<JSONObject> {
-        val raw = requireContext().getSharedPreferences("sticker_packs", 0).getString("packs", "[]") ?: "[]"
+        val raw = getProviderContext().getSharedPreferences("sticker_packs", 0).getString("packs", "[]") ?: "[]"
         val array = JSONArray(raw)
         return (0 until array.length()).map { array.getJSONObject(it) }
     }
     private fun findPack(id: String): JSONObject? = packs().firstOrNull { it.optString("id") == id }
     private fun metadata(id: String): JSONObject? {
         val pack = findPack(id) ?: return null
-        val file = File(requireContext().filesDir, "sticker_packs/${pack.optString("id")}/metadata.json")
+        val file = File(getProviderContext().filesDir, "sticker_packs/${pack.optString("id")}/metadata.json")
         return if (file.exists()) JSONObject(file.readText()) else null
     }
 }
